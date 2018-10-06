@@ -128,8 +128,7 @@ class KNearestNeighbor(object):
         test_sum = (X ** 2).sum(axis=1, keepdims=True)
         train_sum = (self.X_train ** 2).sum(axis=1)
         # add with broadcasting
-        dists = np.sqrt(
-            test_sum + train_sum - 2 * X.dot(self.X_train.T))
+        dists = np.sqrt(test_sum + train_sum - 2 * X.dot(self.X_train.T))
         #########################################################################
         #                         END OF YOUR CODE                              #
         #########################################################################
