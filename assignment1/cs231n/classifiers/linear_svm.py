@@ -32,11 +32,11 @@ def svm_loss_naive(W, X, y, reg):
         for j in range(num_classes):
             if j == y[i]:
                 continue
-            margin = scores[j] - correct_class_score + 1  # note delta = 1
+            margin = scores[j] - correct_class_score + 1    # note delta = 1
             if margin > 0:
                 loss += margin
-                dW[:, j] += X[i].T  # effect from scores[j]
-                dW[:, y[i]] += -X[i].T  # effect from correct_class_score
+                dW[:, j] += X[i].T                          # effect from scores[j]
+                dW[:, y[i]] += -X[i].T                      # effect from correct_class_score
 
     # Right now the loss is a sum over all training examples, but we want it
     # to be an average instead so we divide by num_train.
@@ -55,7 +55,6 @@ def svm_loss_naive(W, X, y, reg):
     # loss is being computed. As a result you may need to modify some of the    #
     # code above to compute the gradient.                                       #
     #############################################################################
-
     return loss, dW
 
 
@@ -67,13 +66,20 @@ def svm_loss_vectorized(W, X, y, reg):
     """
     loss = 0.0
     dW = np.zeros(W.shape)  # initialize the gradient as zero
-
+    num_train = X.shape[0]
     #############################################################################
     # TODO:                                                                     #
     # Implement a vectorized version of the structured SVM loss, storing the    #
     # result in loss.                                                           #
     #############################################################################
-    pass
+    scores = X.dot(W)
+    correct_scores = scores[np.arange(num_train), y].reshape(-1, 1)
+    hinge_loss = scores - correct_scores + 1    # find scores
+    hinge_loss[hinge_loss < 0] = 0              # max{score, 0}
+    hinge_loss[np.arange(num_train), y] = 0     # zero the score for correct label
+    loss = np.sum(hinge_loss)
+    loss /= num_train
+    loss += reg * np.sum(W * W)
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -87,7 +93,10 @@ def svm_loss_vectorized(W, X, y, reg):
     # to reuse some of the intermediate values that you used to compute the     #
     # loss.                                                                     #
     #############################################################################
-    pass
+    # apparently, dW is a elementary row transformation of W
+    row_trans_matrix = hinge_loss
+    row_trans_matrix[row_trans_matrix > 0] = 1
+
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
