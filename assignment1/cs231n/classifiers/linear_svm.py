@@ -93,10 +93,12 @@ def svm_loss_vectorized(W, X, y, reg):
     # to reuse some of the intermediate values that you used to compute the     #
     # loss.                                                                     #
     #############################################################################
-    # apparently, dW is a elementary row transformation of W
-    row_trans_matrix = hinge_loss
-    row_trans_matrix[row_trans_matrix > 0] = 1
+    marks = np.zeros(scores.shape)              # build a zero matrix whose shape is (N, C)
+    marks[hinge_loss > 0] = 1                   # mark effect doses that comes from scores
+    marks[np.arange(num_train), y] = -np.sum(marks, axis=1)  # mark effect doses that come from correct_class_score
 
+    dW = (X.T).dot(marks)
+    dW = dW / num_train + 2 * reg * W
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
